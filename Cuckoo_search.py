@@ -18,6 +18,7 @@ def get_cuckoos(nest, bestnest, Lb, Ub):
         step = u / abs(v) ** (1 / beta)
         step_size = 0.01 * step * (single_nest - bestnest)
         single_nest = single_nest + step_size * np.random.randn(single_nest.shape[0])
+        single_nest = single_nest[0]
         nest[j, :] = simplebounds(single_nest, Lb, Ub)
 
     return nest
@@ -29,8 +30,8 @@ def empty_nests(nest, Lb, Ub, pa):
     n = nest.shape[0]
     K = np.random.rand(nest.shape[0], nest.shape[1]) > pa
 
-    nestn1 = nest[np.random.shuffle(n), :]
-    nestn2 = nest[np.random.shuffle(n), :]
+    nestn1 = nest[np.random.permutation(n), :]
+    nestn2 = nest[np.random.permutation(n), :]
     # New solution by biased/selective random walks
     stepsize = np.random.rand() * (nestn1 - nestn2)
     new_nest = nest + stepsize * K
@@ -79,16 +80,16 @@ def get_fitness_cs(nest, Y, Phi, U):
 
 
 def get_fitness(nest):
-    return -(pow(nest[0], 2) + pow(nest[1] + 1, 2)) + 4
+    return (pow(nest[0], 2) + pow(nest[1] + 1, 2)) + 4
 
 
 def simplebounds(single_nest, Lb, Ub):
-    dimension = single_nest[0].shape[0]
+    dimension = single_nest.shape[0]
     for j in range(dimension):
-        if single_nest[0][j] < Lb[j]:
-            single_nest[0][j] = Lb[j]
-        elif single_nest[0][j] > Ub[j]:
-            single_nest[0][j] = Ub[j]
+        if single_nest[j] < Lb[j]:
+            single_nest[j] = Lb[j]
+        elif single_nest[j] > Ub[j]:
+            single_nest[j] = Ub[j]
 
     return single_nest
 
@@ -120,4 +121,4 @@ if __name__ == '__main__':
             fmin = fnew
             bestnest = best
 
-    print best, fitness
+    print bestnest, fmin
